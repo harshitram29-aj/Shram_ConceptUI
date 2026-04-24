@@ -4,692 +4,215 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Shram — Tasks that carry their story</title>
-<link href="https://fonts.googleapis.com/css2?family=Newsreader:ital,wght@0,300;0,400;0,500;1,300;1,400&family=Geist:wght@300;400;500&family=Geist+Mono:wght@400;500&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
 <style>
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-
 :root {
-  --paper: #f5f0e8;
-  --paper2: #ede8dc;
-  --ink: #1c1814;
-  --ink2: #3d362d;
-  --ink3: #7a6f63;
-  --ink4: #b0a496;
-  --warm: #c17f24;
-  --warm2: #f5e6cc;
-  --warm3: #fdf7ee;
-  --green: #3d6b4f;
-  --green2: #e8f2ec;
-  --blue: #2d4a7a;
-  --blue2: #e8eef7;
-  --rose: #8b3a3a;
-  --rose2: #f7eaea;
-  --border: rgba(28,24,20,0.1);
-  --shadow: 0 1px 3px rgba(28,24,20,0.08), 0 8px 24px rgba(28,24,20,0.04);
+  --bg: #f7f5f2; --sidebar-bg: #f0ede8; --card: #ffffff;
+  --ink: #1a1a1a; --ink2: #3a3a3a; --ink3: #6b6b6b; --ink4: #a8a8a8;
+  --border: #e2ddd8; --border2: #d4cfc9;
+  --warm: #a0622a; --warm-bg: #f5ece2;
+  --green: #2d6a4f; --green-bg: #e8f2ec;
+  --blue: #2a4a7a; --blue-bg: #e8edf7;
+  --rose: #7a3030; --rose-bg: #f5e8e8;
+  --shadow: 0 1px 3px rgba(0,0,0,0.07), 0 4px 16px rgba(0,0,0,0.04);
 }
-
-html { scroll-behavior: smooth; }
-
-body {
-  font-family: 'Geist', system-ui, sans-serif;
-  background: var(--paper);
-  color: var(--ink);
-  min-height: 100vh;
-  overflow-x: hidden;
-}
-
-/* Grain texture overlay */
-body::before {
-  content: '';
-  position: fixed;
-  inset: 0;
-  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.035'/%3E%3C/svg%3E");
-  pointer-events: none;
-  z-index: 0;
-  opacity: .5;
-}
-
-/* LAYOUT */
-.shell {
-  display: grid;
-  grid-template-columns: 220px 1fr;
-  min-height: 100vh;
-  position: relative;
-  z-index: 1;
-  max-width: 1100px;
-  margin: 0 auto;
-}
+body { font-family: 'Inter', -apple-system, sans-serif; background: var(--bg); color: var(--ink); height: 100vh; overflow: hidden; font-size: 14px; line-height: 1.5; }
+.app { display: grid; grid-template-columns: 200px 1fr; height: 100vh; }
 
 /* SIDEBAR */
-.sidebar {
-  border-right: 1px solid var(--border);
-  padding: 28px 0;
-  background: rgba(237,232,220,0.4);
-  backdrop-filter: blur(8px);
-  display: flex;
-  flex-direction: column;
-  gap: 0;
-}
-.sidebar-logo {
-  padding: 0 20px 24px;
-  border-bottom: 1px solid var(--border);
-  margin-bottom: 16px;
-  display: flex;
-  align-items: center;
-  gap: 8px;
-}
-.logo-mark {
-  width: 26px;
-  height: 26px;
-  background: var(--ink);
-  border-radius: 6px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-.logo-mark svg { width: 14px; height: 14px; }
-.logo-name {
-  font-family: 'Newsreader', Georgia, serif;
-  font-size: 15px;
-  font-weight: 500;
-  color: var(--ink);
-  letter-spacing: -0.01em;
-}
-.sidebar-section {
-  padding: 4px 12px;
-  margin-bottom: 2px;
-}
-.sidebar-label {
-  font-family: 'Geist Mono', monospace;
-  font-size: 9px;
-  letter-spacing: .1em;
-  text-transform: uppercase;
-  color: var(--ink4);
-  padding: 6px 8px 4px;
-}
-.sidebar-item {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  padding: 7px 8px;
-  border-radius: 7px;
-  cursor: pointer;
-  font-size: 13px;
-  color: var(--ink3);
-  transition: all .15s;
-  font-weight: 400;
-}
-.sidebar-item:hover { background: rgba(28,24,20,0.05); color: var(--ink); }
-.sidebar-item.active { background: var(--ink); color: white; }
-.sidebar-item .dot {
-  width: 6px; height: 6px;
-  border-radius: 50%;
-  flex-shrink: 0;
-}
-.sidebar-count {
-  margin-left: auto;
-  font-family: 'Geist Mono', monospace;
-  font-size: 10px;
-  opacity: .5;
-}
-.sidebar-footer {
-  margin-top: auto;
-  padding: 16px 20px 0;
-  border-top: 1px solid var(--border);
-}
-.user-chip {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  font-size: 12px;
-  color: var(--ink3);
-}
-.user-avatar {
-  width: 26px;
-  height: 26px;
-  border-radius: 50%;
-  background: var(--warm2);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-family: 'Newsreader', serif;
-  font-size: 12px;
-  color: var(--warm);
-  font-weight: 500;
-  flex-shrink: 0;
-}
+.sidebar { background: var(--sidebar-bg); border-right: 1px solid var(--border); display: flex; flex-direction: column; }
+.sidebar-logo { padding: 20px 16px 18px; border-bottom: 1px solid var(--border); display: flex; align-items: center; gap: 8px; }
+.logo-text { font-size: 15px; font-weight: 600; color: var(--ink); letter-spacing: -0.02em; }
+.sidebar-nav { padding: 12px 8px; flex: 1; overflow-y: auto; }
+.nav-section { margin-bottom: 16px; }
+.nav-label { font-size: 10px; font-weight: 500; letter-spacing: .08em; text-transform: uppercase; color: var(--ink4); padding: 0 8px; margin-bottom: 4px; display: block; }
+.nav-item { display: flex; align-items: center; gap: 8px; padding: 6px 8px; border-radius: 6px; cursor: pointer; font-size: 13px; color: var(--ink3); transition: all .12s; border: none; background: transparent; width: 100%; text-align: left; font-family: inherit; }
+.nav-item:hover { background: rgba(0,0,0,0.04); color: var(--ink); }
+.nav-item.active { background: var(--ink); color: #fff; }
+.nav-item.active .nav-dot { background: white !important; }
+.nav-item.active .nav-count { color: rgba(255,255,255,0.5); }
+.nav-dot { width: 6px; height: 6px; border-radius: 50%; background: var(--ink4); flex-shrink: 0; }
+.nav-count { margin-left: auto; font-size: 11px; color: var(--ink4); }
+.sidebar-footer { padding: 12px 16px; border-top: 1px solid var(--border); }
+.user-row { display: flex; align-items: center; gap: 8px; font-size: 12px; color: var(--ink3); }
+.user-avatar { width: 24px; height: 24px; border-radius: 50%; background: var(--warm-bg); display: flex; align-items: center; justify-content: center; font-size: 11px; font-weight: 600; color: var(--warm); flex-shrink: 0; }
 
 /* MAIN */
-.main {
-  padding: 32px 36px;
-  overflow-y: auto;
-}
-.main-header {
-  display: flex;
-  align-items: baseline;
-  justify-content: space-between;
-  margin-bottom: 8px;
-}
-.main-title {
-  font-family: 'Newsreader', Georgia, serif;
-  font-size: 22px;
-  font-weight: 400;
-  color: var(--ink);
-  letter-spacing: -0.02em;
-}
-.main-date {
-  font-family: 'Geist Mono', monospace;
-  font-size: 11px;
-  color: var(--ink4);
-  letter-spacing: .04em;
-}
-.main-sub {
-  font-size: 13px;
-  color: var(--ink3);
-  margin-bottom: 28px;
-  line-height: 1.5;
-}
+.main { display: flex; flex-direction: column; overflow: hidden; }
+.main-header { padding: 24px 32px 0; flex-shrink: 0; }
+.main-top { display: flex; align-items: baseline; justify-content: space-between; margin-bottom: 3px; }
+.main-title { font-size: 20px; font-weight: 600; letter-spacing: -0.025em; }
+.main-date { font-size: 11px; color: var(--ink4); }
+.main-sub { font-size: 12.5px; color: var(--ink3); margin-bottom: 14px; }
+.filter-row { display: flex; gap: 5px; padding-bottom: 14px; border-bottom: 1px solid var(--border); flex-wrap: wrap; }
+.filter-btn { font-size: 12px; font-family: inherit; padding: 4px 12px; border-radius: 20px; border: 1px solid var(--border2); background: transparent; color: var(--ink3); cursor: pointer; transition: all .12s; }
+.filter-btn:hover { border-color: var(--ink3); color: var(--ink); }
+.filter-btn.active { background: var(--ink); color: white; border-color: var(--ink); }
+.task-list { flex: 1; overflow-y: auto; padding: 14px 32px 60px; }
 
-/* FILTER ROW */
-.filter-row {
-  display: flex;
-  gap: 6px;
-  margin-bottom: 20px;
-  flex-wrap: wrap;
-}
-.filter-chip {
-  font-family: 'Geist Mono', monospace;
-  font-size: 10px;
-  letter-spacing: .05em;
-  padding: 4px 10px;
-  border-radius: 20px;
-  border: 1px solid var(--border);
-  background: transparent;
-  color: var(--ink3);
-  cursor: pointer;
-  transition: all .15s;
-}
-.filter-chip:hover { border-color: var(--ink3); color: var(--ink); }
-.filter-chip.active { background: var(--ink); color: white; border-color: var(--ink); }
+/* TASK CARD */
+.task-card { background: var(--card); border: 1px solid var(--border); border-radius: 10px; margin-bottom: 8px; box-shadow: 0 1px 2px rgba(0,0,0,0.05); overflow: hidden; transition: box-shadow .15s; }
+.task-card:hover { box-shadow: var(--shadow); }
+.task-card.is-done { opacity: 0.5; }
+.task-card.is-hidden { display: none; }
+.task-row { display: flex; align-items: center; gap: 11px; padding: 13px 14px; cursor: pointer; user-select: none; }
+.check-btn { width: 17px; height: 17px; border-radius: 50%; border: 1.5px solid var(--border2); background: transparent; cursor: pointer; flex-shrink: 0; display: flex; align-items: center; justify-content: center; padding: 0; transition: all .15s; }
+.check-btn:hover { border-color: var(--ink3); }
+.task-card.is-done .check-btn { background: var(--ink); border-color: var(--ink); }
+.check-tick { opacity: 0; transition: opacity .15s; }
+.task-card.is-done .check-tick { opacity: 1; }
+.task-body { flex: 1; min-width: 0; }
+.task-name { font-size: 13.5px; font-weight: 500; color: var(--ink); margin-bottom: 2px; line-height: 1.3; }
+.task-card.is-done .task-name { text-decoration: line-through; color: var(--ink4); }
+.task-peek { font-size: 12px; color: var(--ink4); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; font-style: italic; }
+.task-card.is-open .task-peek { display: none; }
+.task-right { display: flex; align-items: center; gap: 7px; flex-shrink: 0; }
+.source-badge { font-size: 10px; font-weight: 500; padding: 2px 7px; border-radius: 20px; display: inline-flex; align-items: center; gap: 3px; }
+.badge-meeting { background: var(--warm-bg); color: var(--warm); }
+.badge-whatsapp { background: var(--green-bg); color: var(--green); }
+.badge-email { background: var(--blue-bg); color: var(--blue); }
+.badge-call { background: var(--rose-bg); color: var(--rose); }
+.task-age { font-size: 11px; color: var(--ink4); white-space: nowrap; }
+.chevron { color: var(--ink4); transition: transform .2s cubic-bezier(.4,0,.2,1); flex-shrink: 0; }
+.task-card.is-open .chevron { transform: rotate(180deg); }
 
-/* TASK CARDS */
-.task-list { display: flex; flex-direction: column; gap: 10px; }
-
-.task-card {
-  background: rgba(255,255,255,0.7);
-  border: 1px solid var(--border);
-  border-radius: 12px;
-  overflow: hidden;
-  box-shadow: var(--shadow);
-  transition: box-shadow .2s, transform .2s;
-  backdrop-filter: blur(4px);
-}
-.task-card:hover {
-  box-shadow: 0 2px 8px rgba(28,24,20,0.1), 0 12px 32px rgba(28,24,20,0.06);
-  transform: translateY(-1px);
-}
-.task-card.done { opacity: .55; }
-
-/* TASK ROW — collapsed view */
-.task-row {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-  padding: 14px 16px;
-  cursor: pointer;
-  user-select: none;
-}
-.task-check {
-  width: 18px;
-  height: 18px;
-  border-radius: 50%;
-  border: 1.5px solid var(--border);
-  flex-shrink: 0;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  transition: all .2s;
-  cursor: pointer;
-  background: transparent;
-}
-.task-check:hover { border-color: var(--warm); }
-.task-card.done .task-check {
-  background: var(--ink);
-  border-color: var(--ink);
-}
-.task-check-icon {
-  width: 8px;
-  height: 8px;
-  opacity: 0;
-  transition: opacity .2s;
-}
-.task-card.done .task-check-icon { opacity: 1; }
-
-.task-main { flex: 1; min-width: 0; }
-.task-title {
-  font-size: 14px;
-  font-weight: 500;
-  color: var(--ink);
-  line-height: 1.3;
-  margin-bottom: 3px;
-  transition: color .15s;
-}
-.task-card.done .task-title {
-  text-decoration: line-through;
-  color: var(--ink4);
-}
-.task-preview {
-  font-size: 12px;
-  color: var(--ink4);
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  font-style: italic;
-  line-height: 1.4;
-  font-family: 'Newsreader', serif;
-}
-.task-card.open .task-preview { display: none; }
-
-.task-meta {
-  display: flex;
-  align-items: center;
-  gap: 6px;
-  flex-shrink: 0;
-}
-.task-source-badge {
-  display: flex;
-  align-items: center;
-  gap: 4px;
-  font-family: 'Geist Mono', monospace;
-  font-size: 9px;
-  letter-spacing: .04em;
-  padding: 3px 7px;
-  border-radius: 20px;
-  font-weight: 500;
-}
-.badge-whatsapp { background: var(--green2); color: var(--green); }
-.badge-email { background: var(--blue2); color: var(--blue); }
-.badge-meeting { background: var(--warm2); color: var(--warm); }
-.badge-call { background: var(--rose2); color: var(--rose); }
-
-.task-time {
-  font-family: 'Geist Mono', monospace;
-  font-size: 10px;
-  color: var(--ink4);
-}
-.expand-arrow {
-  width: 16px;
-  height: 16px;
-  color: var(--ink4);
-  transition: transform .25s cubic-bezier(.4,0,.2,1);
-  flex-shrink: 0;
-}
-.task-card.open .expand-arrow { transform: rotate(180deg); }
-
-/* STORY PANEL — expanded */
-.story-panel {
-  max-height: 0;
-  overflow: hidden;
-  transition: max-height .35s cubic-bezier(.4,0,.2,1);
-  border-top: 0 solid var(--border);
-}
-.task-card.open .story-panel {
-  max-height: 600px;
-  border-top-width: 1px;
-}
-.story-inner {
-  padding: 16px 16px 16px 46px;
-  display: grid;
-  grid-template-columns: 1fr 240px;
-  gap: 20px;
-}
-
-/* Context narrative */
-.story-context {}
-.story-section-label {
-  font-family: 'Geist Mono', monospace;
-  font-size: 9px;
-  letter-spacing: .1em;
-  text-transform: uppercase;
-  color: var(--ink4);
-  margin-bottom: 6px;
-}
-.story-text {
-  font-family: 'Newsreader', Georgia, serif;
-  font-size: 13.5px;
-  color: var(--ink2);
-  line-height: 1.7;
-  margin-bottom: 14px;
-  font-style: italic;
-}
-.story-quote {
-  background: var(--warm3);
-  border-left: 2px solid var(--warm);
-  padding: 8px 12px;
-  border-radius: 0 6px 6px 0;
-  margin-bottom: 14px;
-  font-family: 'Newsreader', serif;
-  font-size: 13px;
-  font-style: italic;
-  color: var(--ink2);
-  line-height: 1.6;
-}
-.story-quote cite {
-  display: block;
-  font-style: normal;
-  font-family: 'Geist Mono', monospace;
-  font-size: 9px;
-  color: var(--ink4);
-  margin-top: 4px;
-  letter-spacing: .04em;
-}
-
-/* Draft + actions */
-.story-actions {}
-.draft-label {
-  font-family: 'Geist Mono', monospace;
-  font-size: 9px;
-  letter-spacing: .1em;
-  text-transform: uppercase;
-  color: var(--ink4);
-  margin-bottom: 6px;
-}
-.draft-box {
-  background: var(--paper);
-  border: 1px solid var(--border);
-  border-radius: 8px;
-  padding: 10px 12px;
-  font-size: 12.5px;
-  color: var(--ink2);
-  line-height: 1.65;
-  margin-bottom: 10px;
-  font-family: 'Newsreader', serif;
-  min-height: 80px;
-  resize: none;
-  width: 100%;
-  outline: none;
-  transition: border-color .15s;
-}
-.draft-box:focus { border-color: var(--warm); }
-
-.action-row {
-  display: flex;
-  gap: 6px;
-  flex-wrap: wrap;
-}
-.btn-execute {
-  flex: 1;
-  background: var(--ink);
-  color: white;
-  border: none;
-  border-radius: 7px;
-  padding: 8px 14px;
-  font-family: 'Geist', sans-serif;
-  font-size: 12px;
-  font-weight: 500;
-  cursor: pointer;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 5px;
-  transition: opacity .15s;
-}
-.btn-execute:hover { opacity: .85; }
-.btn-ghost {
-  background: transparent;
-  border: 1px solid var(--border);
-  border-radius: 7px;
-  padding: 8px 12px;
-  font-family: 'Geist', sans-serif;
-  font-size: 12px;
-  color: var(--ink3);
-  cursor: pointer;
-  transition: all .15s;
-}
-.btn-ghost:hover { border-color: var(--ink3); color: var(--ink); }
-
-/* Tone chips */
-.tone-row {
-  display: flex;
-  gap: 4px;
-  margin-bottom: 8px;
-  flex-wrap: wrap;
-}
-.tone-chip {
-  font-family: 'Geist Mono', monospace;
-  font-size: 9px;
-  padding: 3px 7px;
-  border-radius: 20px;
-  border: 1px solid var(--border);
-  background: transparent;
-  color: var(--ink4);
-  cursor: pointer;
-  transition: all .15s;
-  letter-spacing: .03em;
-}
-.tone-chip:hover, .tone-chip.active { background: var(--warm2); border-color: var(--warm); color: var(--warm); }
-
-/* Timeline dots on context */
-.timeline { display: flex; flex-direction: column; gap: 0; }
-.tl-item {
-  display: flex;
-  gap: 10px;
-  padding-bottom: 12px;
-  position: relative;
-}
-.tl-item::before {
-  content: '';
-  position: absolute;
-  left: 5px;
-  top: 14px;
-  bottom: 0;
-  width: 1px;
-  background: var(--border);
-}
+/* STORY PANEL */
+.story-panel { max-height: 0; overflow: hidden; transition: max-height .3s cubic-bezier(.4,0,.2,1); }
+.task-card.is-open .story-panel { max-height: 500px; }
+.story-body { border-top: 1px solid var(--border); padding: 14px 14px 14px 42px; display: grid; grid-template-columns: 1fr 220px; gap: 20px; }
+.ctx-label { font-size: 9.5px; font-weight: 600; letter-spacing: .1em; text-transform: uppercase; color: var(--ink4); margin-bottom: 5px; }
+.ctx-text { font-size: 12.5px; color: var(--ink2); line-height: 1.65; margin-bottom: 10px; }
+.ctx-quote { background: var(--warm-bg); border-left: 2px solid var(--warm); padding: 7px 10px; border-radius: 0 6px 6px 0; margin-bottom: 10px; font-size: 12px; font-style: italic; color: var(--ink2); line-height: 1.55; }
+.ctx-quote cite { font-style: normal; font-size: 10px; color: var(--ink4); display: block; margin-top: 3px; }
+.tl { display: flex; flex-direction: column; }
+.tl-item { display: flex; gap: 9px; padding-bottom: 9px; position: relative; }
+.tl-item::before { content: ''; position: absolute; left: 4px; top: 12px; bottom: 0; width: 1px; background: var(--border); }
 .tl-item:last-child::before { display: none; }
-.tl-dot {
-  width: 11px;
-  height: 11px;
-  border-radius: 50%;
-  border: 1.5px solid var(--border);
-  background: var(--paper);
-  flex-shrink: 0;
-  margin-top: 3px;
-}
-.tl-dot.active { border-color: var(--warm); background: var(--warm); }
-.tl-content {}
-.tl-ts {
-  font-family: 'Geist Mono', monospace;
-  font-size: 9px;
-  color: var(--ink4);
-  margin-bottom: 2px;
-  letter-spacing: .03em;
-}
-.tl-text {
-  font-size: 12px;
-  color: var(--ink3);
-  line-height: 1.5;
-}
-
-/* Empty state at bottom */
-.empty-note {
-  text-align: center;
-  padding: 32px 0 0;
-  font-family: 'Newsreader', serif;
-  font-style: italic;
-  font-size: 13px;
-  color: var(--ink4);
-}
-
-/* Concept badge */
-.concept-banner {
-  background: var(--ink);
-  color: rgba(255,255,255,.55);
-  font-family: 'Geist Mono', monospace;
-  font-size: 10px;
-  letter-spacing: .08em;
-  text-align: center;
-  padding: 6px;
-  position: fixed;
-  bottom: 0;
-  left: 0;
-  right: 0;
-  z-index: 100;
-}
-.concept-banner strong { color: rgba(255,255,255,.85); }
-
-@media (max-width: 700px) {
-  .shell { grid-template-columns: 1fr; }
+.tl-dot { width: 9px; height: 9px; border-radius: 50%; border: 1.5px solid var(--border2); background: var(--bg); flex-shrink: 0; margin-top: 3px; }
+.tl-dot.now { border-color: var(--warm); background: var(--warm); }
+.tl-ts { font-size: 9.5px; color: var(--ink4); margin-bottom: 1px; }
+.tl-txt { font-size: 11.5px; color: var(--ink3); line-height: 1.4; }
+.draft-label { font-size: 9.5px; font-weight: 600; letter-spacing: .1em; text-transform: uppercase; color: var(--ink4); margin-bottom: 5px; }
+.tone-row { display: flex; gap: 4px; margin-bottom: 7px; }
+.tone-btn { font-size: 10.5px; font-family: inherit; padding: 3px 9px; border-radius: 20px; border: 1px solid var(--border2); background: transparent; color: var(--ink4); cursor: pointer; transition: all .12s; }
+.tone-btn:hover { border-color: var(--ink3); color: var(--ink); }
+.tone-btn.active { background: var(--warm-bg); border-color: var(--warm); color: var(--warm); }
+.draft-text { width: 100%; min-height: 88px; padding: 8px 10px; border: 1px solid var(--border); border-radius: 7px; background: var(--bg); font-family: inherit; font-size: 12px; color: var(--ink2); line-height: 1.6; resize: none; outline: none; transition: border-color .12s; margin-bottom: 8px; }
+.draft-text:focus { border-color: var(--ink3); }
+.action-row { display: flex; gap: 5px; }
+.btn-send { flex: 1; background: var(--ink); color: white; border: none; border-radius: 6px; padding: 7px 12px; font-family: inherit; font-size: 12px; font-weight: 500; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 5px; transition: opacity .12s, background .2s; }
+.btn-send:hover { opacity: .85; }
+.btn-send.sent { background: var(--green); }
+.btn-edit, .btn-later { background: transparent; border: 1px solid var(--border2); border-radius: 6px; padding: 7px 11px; font-family: inherit; font-size: 12px; color: var(--ink3); cursor: pointer; transition: all .12s; }
+.btn-edit:hover, .btn-later:hover { border-color: var(--ink3); color: var(--ink); }
+.concept-strip { position: fixed; bottom: 0; left: 0; right: 0; background: var(--ink); color: rgba(255,255,255,0.4); font-size: 10px; text-align: center; padding: 5px; z-index: 999; letter-spacing: .03em; }
+.concept-strip strong { color: rgba(255,255,255,.7); }
+@media (max-width: 640px) {
+  .app { grid-template-columns: 1fr; }
   .sidebar { display: none; }
-  .main { padding: 20px 18px; }
-  .story-inner { grid-template-columns: 1fr; }
+  .main-header { padding: 16px 16px 0; }
+  .task-list { padding: 12px 16px 80px; }
+  .story-body { grid-template-columns: 1fr; }
 }
 </style>
 </head>
 <body>
-
-<div class="shell">
-
-  <!-- SIDEBAR -->
+<div class="app">
   <aside class="sidebar">
     <div class="sidebar-logo">
-      <div class="logo-mark">
-        <svg viewBox="0 0 14 14" fill="none">
-          <circle cx="4.5" cy="4.5" r="2.5" fill="white"/>
-          <circle cx="9.5" cy="9.5" r="2.5" fill="white" opacity=".5"/>
-          <circle cx="9.5" cy="4.5" r="1.5" fill="white" opacity=".3"/>
-        </svg>
-      </div>
-      <span class="logo-name">Shram</span>
+      <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
+        <path d="M10 2L19 17H1L10 2Z" fill="#1a1a1a"/>
+      </svg>
+      <span class="logo-text">Shram</span>
     </div>
-
-    <div class="sidebar-section">
-      <div class="sidebar-label">Focus</div>
-      <div class="sidebar-item active">
-        <div class="dot" style="background:#1c1814"></div>
-        Today
-        <span class="sidebar-count">4</span>
+    <nav class="sidebar-nav">
+      <div class="nav-section">
+        <span class="nav-label">Focus</span>
+        <button class="nav-item active" data-filter="all">
+          <span class="nav-dot"></span>Today<span class="nav-count">4</span>
+        </button>
+        <button class="nav-item" data-view="upcoming">
+          <span class="nav-dot"></span>Upcoming<span class="nav-count">12</span>
+        </button>
+        <button class="nav-item" data-view="done">
+          <span class="nav-dot"></span>Done<span class="nav-count" id="count-done">38</span>
+        </button>
       </div>
-      <div class="sidebar-item">
-        <div class="dot" style="background:#b0a496"></div>
-        Upcoming
-        <span class="sidebar-count">12</span>
+      <div class="nav-section">
+        <span class="nav-label">By source</span>
+        <button class="nav-item" data-filter="whatsapp">
+          <span class="nav-dot" style="background:var(--green)"></span>WhatsApp<span class="nav-count">6</span>
+        </button>
+        <button class="nav-item" data-filter="email">
+          <span class="nav-dot" style="background:var(--blue)"></span>Email<span class="nav-count">5</span>
+        </button>
+        <button class="nav-item" data-filter="meeting">
+          <span class="nav-dot" style="background:var(--warm)"></span>Meetings<span class="nav-count">3</span>
+        </button>
+        <button class="nav-item" data-filter="call">
+          <span class="nav-dot" style="background:var(--rose)"></span>Calls<span class="nav-count">2</span>
+        </button>
       </div>
-      <div class="sidebar-item">
-        <div class="dot" style="background:#b0a496"></div>
-        Done
-        <span class="sidebar-count">38</span>
-      </div>
-    </div>
-
-    <div class="sidebar-section">
-      <div class="sidebar-label">By source</div>
-      <div class="sidebar-item">
-        <div class="dot" style="background:#3d6b4f"></div>
-        WhatsApp
-        <span class="sidebar-count">6</span>
-      </div>
-      <div class="sidebar-item">
-        <div class="dot" style="background:#2d4a7a"></div>
-        Email
-        <span class="sidebar-count">5</span>
-      </div>
-      <div class="sidebar-item">
-        <div class="dot" style="background:#c17f24"></div>
-        Meetings
-        <span class="sidebar-count">3</span>
-      </div>
-    </div>
-
+    </nav>
     <div class="sidebar-footer">
-      <div class="user-chip">
-        <div class="user-avatar">H</div>
-        Harshit R.
+      <div class="user-row">
+        <div class="user-avatar">H</div>Harshit R.
       </div>
     </div>
   </aside>
 
-  <!-- MAIN -->
   <main class="main">
     <div class="main-header">
-      <h1 class="main-title">Today's follow-ups</h1>
-      <span class="main-date">Wednesday, 22 April</span>
+      <div class="main-top">
+        <h1 class="main-title" id="view-title">Today's follow-ups</h1>
+        <span class="main-date">Wednesday, 22 April</span>
+      </div>
+      <p class="main-sub" id="view-sub">4 conversations need your attention. Each one has a story.</p>
+      <div class="filter-row">
+        <button class="filter-btn active" data-filter="all">All</button>
+        <button class="filter-btn" data-filter="urgent">Urgent</button>
+        <button class="filter-btn" data-filter="waiting">Waiting on them</button>
+        <button class="filter-btn" data-filter="promised">You promised</button>
+      </div>
     </div>
-    <p class="main-sub">4 conversations need your attention. Each one has a story.</p>
 
-    <div class="filter-row">
-      <button class="filter-chip active">All</button>
-      <button class="filter-chip">Urgent</button>
-      <button class="filter-chip">Waiting on them</button>
-      <button class="filter-chip">You promised</button>
-    </div>
+    <div class="task-list" id="task-list">
 
-    <div class="task-list">
-
-      <!-- TASK 1 — expanded by default -->
-      <div class="task-card open" id="t1">
-        <div class="task-row" onclick="toggleTask('t1')">
-          <div class="task-check" onclick="event.stopPropagation(); toggleDone('t1')">
-            <svg class="task-check-icon" viewBox="0 0 8 8" fill="none">
-              <path d="M1 4l2 2 4-4" stroke="white" stroke-width="1.5" stroke-linecap="round"/>
-            </svg>
+      <div class="task-card is-open" id="card-1" data-source="meeting" data-tag="promised">
+        <div class="task-row" data-card="1">
+          <button class="check-btn" data-check="1"><svg class="check-tick" width="8" height="8" viewBox="0 0 8 8" fill="none"><path d="M1.5 4l2 2 3-3" stroke="white" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
+          <div class="task-body">
+            <div class="task-name">Send revised proposal to Rahul</div>
+            <div class="task-peek">His budget got cut 30%. He seemed interested but hesitant...</div>
           </div>
-          <div class="task-main">
-            <div class="task-title">Send revised proposal to Rahul</div>
-            <div class="task-preview">You mentioned his budget got cut. He seemed interested but hesitant...</div>
-          </div>
-          <div class="task-meta">
-            <span class="task-source-badge badge-meeting">● MEETING</span>
-            <span class="task-time">2d ago</span>
-            <svg class="expand-arrow" viewBox="0 0 16 16" fill="none">
-              <path d="M4 6l4 4 4-4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
-            </svg>
+          <div class="task-right">
+            <span class="source-badge badge-meeting">● MEETING</span>
+            <span class="task-age">2d ago</span>
+            <svg class="chevron" width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M3 5l4 4 4-4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
           </div>
         </div>
         <div class="story-panel">
-          <div class="story-inner">
-            <div class="story-context">
-              <div class="story-section-label">What happened</div>
-              <div class="story-text">
-                40-minute call on Monday. Rahul was engaged but mentioned partway through that his Q2 budget had been cut by 30%. He didn't say no — he said he needed to see if the numbers could work differently.
-              </div>
-              <div class="story-quote">
-                "If you can bring it closer to ₹4L instead of ₹5.5L, I think I can get it approved internally. Let me know if that's even possible."
-                <cite>— Rahul, Monday 14:32</cite>
-              </div>
-              <div class="story-section-label" style="margin-top:4px">Timeline</div>
-              <div class="timeline">
-                <div class="tl-item">
-                  <div class="tl-dot"></div>
-                  <div class="tl-content">
-                    <div class="tl-ts">MON APR 14 · ZOOM</div>
-                    <div class="tl-text">First call. Discussed scope, timeline, pricing.</div>
-                  </div>
-                </div>
-                <div class="tl-item">
-                  <div class="tl-dot"></div>
-                  <div class="tl-content">
-                    <div class="tl-ts">MON APR 14 · EMAIL</div>
-                    <div class="tl-text">You said you'd send a revised proposal by Wednesday.</div>
-                  </div>
-                </div>
-                <div class="tl-item">
-                  <div class="tl-dot active"></div>
-                  <div class="tl-content">
-                    <div class="tl-ts">TODAY · FOLLOW-UP DUE</div>
-                    <div class="tl-text">Wednesday. You promised. He's waiting.</div>
-                  </div>
-                </div>
+          <div class="story-body">
+            <div>
+              <div class="ctx-label">What happened</div>
+              <div class="ctx-text">40-minute call on Monday. Rahul was engaged but mentioned his Q2 budget had been cut by 30%. He didn't say no — he said he needed to see if the numbers could work differently.</div>
+              <div class="ctx-quote">"If you can bring it closer to ₹4L instead of ₹5.5L, I think I can get it approved internally. Let me know if that's even possible."<cite>— Rahul, Monday 14:32</cite></div>
+              <div class="ctx-label">Timeline</div>
+              <div class="tl">
+                <div class="tl-item"><div class="tl-dot"></div><div><div class="tl-ts">MON APR 14 · ZOOM</div><div class="tl-txt">First call. Scope, timeline, pricing discussed.</div></div></div>
+                <div class="tl-item"><div class="tl-dot"></div><div><div class="tl-ts">MON APR 14 · EMAIL</div><div class="tl-txt">You said you'd send a revised proposal by Wednesday.</div></div></div>
+                <div class="tl-item"><div class="tl-dot now"></div><div><div class="tl-ts">TODAY · DUE</div><div class="tl-txt">Wednesday. You promised. He's waiting.</div></div></div>
               </div>
             </div>
-            <div class="story-actions">
+            <div>
               <div class="draft-label">Shram drafted</div>
               <div class="tone-row">
-                <button class="tone-chip active">Warm</button>
-                <button class="tone-chip">Direct</button>
-                <button class="tone-chip">Brief</button>
+                <button class="tone-btn active" data-card="1" data-tone="warm">Warm</button>
+                <button class="tone-btn" data-card="1" data-tone="direct">Direct</button>
+                <button class="tone-btn" data-card="1" data-tone="brief">Brief</button>
               </div>
-              <textarea class="draft-box">Hi Rahul,
+              <textarea class="draft-text" id="draft-1">Hi Rahul,
 
 Following up on our call — I've reworked the proposal to ₹3.9L while keeping everything we discussed in scope.
 
@@ -697,225 +220,252 @@ Attaching the revised doc. Happy to jump on a quick call if you want to walk thr
 
 Let me know what works.</textarea>
               <div class="action-row">
-                <button class="btn-execute">
-                  <svg width="12" height="12" viewBox="0 0 12 12" fill="none"><path d="M2 6h8M7 3l3 3-3 3" stroke="white" stroke-width="1.5" stroke-linecap="round"/></svg>
-                  Send
-                </button>
-                <button class="btn-ghost">Edit</button>
-                <button class="btn-ghost">Later</button>
+                <button class="btn-send" data-send="1">→ Send</button>
+                <button class="btn-edit" data-edit="1">Edit</button>
+                <button class="btn-later" data-later="1">Later</button>
               </div>
             </div>
           </div>
         </div>
       </div>
 
-      <!-- TASK 2 -->
-      <div class="task-card" id="t2">
-        <div class="task-row" onclick="toggleTask('t2')">
-          <div class="task-check" onclick="event.stopPropagation(); toggleDone('t2')">
-            <svg class="task-check-icon" viewBox="0 0 8 8" fill="none">
-              <path d="M1 4l2 2 4-4" stroke="white" stroke-width="1.5" stroke-linecap="round"/>
-            </svg>
+      <div class="task-card" id="card-2" data-source="whatsapp" data-tag="waiting">
+        <div class="task-row" data-card="2">
+          <button class="check-btn" data-check="2"><svg class="check-tick" width="8" height="8" viewBox="0 0 8 8" fill="none"><path d="M1.5 4l2 2 3-3" stroke="white" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
+          <div class="task-body">
+            <div class="task-name">Check in with Priya on the contract status</div>
+            <div class="task-peek">She said legal was reviewing it. That was 9 days ago...</div>
           </div>
-          <div class="task-main">
-            <div class="task-title">Check in with Priya on the contract status</div>
-            <div class="task-preview">She said legal was reviewing it. That was 9 days ago and you haven't heard back...</div>
-          </div>
-          <div class="task-meta">
-            <span class="task-source-badge badge-whatsapp">● WHATSAPP</span>
-            <span class="task-time">9d ago</span>
-            <svg class="expand-arrow" viewBox="0 0 16 16" fill="none">
-              <path d="M4 6l4 4 4-4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
-            </svg>
+          <div class="task-right">
+            <span class="source-badge badge-whatsapp">● WHATSAPP</span>
+            <span class="task-age">9d ago</span>
+            <svg class="chevron" width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M3 5l4 4 4-4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
           </div>
         </div>
         <div class="story-panel">
-          <div class="story-inner">
-            <div class="story-context">
-              <div class="story-section-label">What happened</div>
-              <div class="story-text">
-                Priya messaged on WhatsApp to say their legal team had the contract and was reviewing the liability clause. She said it would take "a few days." That was 9 days ago. No update since.
-              </div>
-              <div class="story-quote">
-                "I've passed it to legal, should be back with us by end of week. Will let you know!"
-                <cite>— Priya via WhatsApp, Apr 13 · 11:07am</cite>
-              </div>
-              <div class="story-section-label" style="margin-top:4px">Why now</div>
-              <div class="story-text" style="font-size:12.5px">9 days without a reply after a firm "I'll let you know" is a soft stall. Not alarming, but worth a gentle nudge before the week ends.</div>
+          <div class="story-body">
+            <div>
+              <div class="ctx-label">What happened</div>
+              <div class="ctx-text">Priya messaged on WhatsApp to say their legal team had the contract. She said it would take "a few days." That was 9 days ago. Nothing since.</div>
+              <div class="ctx-quote">"I've passed it to legal, should be back with us by end of week. Will let you know!"<cite>— Priya via WhatsApp, Apr 13 · 11:07am</cite></div>
             </div>
-            <div class="story-actions">
+            <div>
               <div class="draft-label">Shram drafted</div>
               <div class="tone-row">
-                <button class="tone-chip active">Warm</button>
-                <button class="tone-chip">Direct</button>
-                <button class="tone-chip">Brief</button>
+                <button class="tone-btn active" data-card="2" data-tone="warm">Warm</button>
+                <button class="tone-btn" data-card="2" data-tone="direct">Direct</button>
+                <button class="tone-btn" data-card="2" data-tone="brief">Brief</button>
               </div>
-              <textarea class="draft-box">Hey Priya,
+              <textarea class="draft-text" id="draft-2">Hey Priya,
 
 Just checking in on the contract — has legal had a chance to come back yet?
 
 No rush, just want to make sure nothing's stuck on my end.</textarea>
               <div class="action-row">
-                <button class="btn-execute">
-                  <svg width="12" height="12" viewBox="0 0 12 12" fill="none"><path d="M2 6h8M7 3l3 3-3 3" stroke="white" stroke-width="1.5" stroke-linecap="round"/></svg>
-                  Send on WhatsApp
-                </button>
-                <button class="btn-ghost">Edit</button>
+                <button class="btn-send" data-send="2">→ Send on WhatsApp</button>
+                <button class="btn-edit" data-edit="2">Edit</button>
+                <button class="btn-later" data-later="2">Later</button>
               </div>
             </div>
           </div>
         </div>
       </div>
 
-      <!-- TASK 3 -->
-      <div class="task-card" id="t3">
-        <div class="task-row" onclick="toggleTask('t3')">
-          <div class="task-check" onclick="event.stopPropagation(); toggleDone('t3')">
-            <svg class="task-check-icon" viewBox="0 0 8 8" fill="none">
-              <path d="M1 4l2 2 4-4" stroke="white" stroke-width="1.5" stroke-linecap="round"/>
-            </svg>
+      <div class="task-card" id="card-3" data-source="email" data-tag="promised">
+        <div class="task-row" data-card="3">
+          <button class="check-btn" data-check="3"><svg class="check-tick" width="8" height="8" viewBox="0 0 8 8" fill="none"><path d="M1.5 4l2 2 3-3" stroke="white" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
+          <div class="task-body">
+            <div class="task-name">Introduce Karan to Meera — you promised to connect them</div>
+            <div class="task-peek">Karan needs a growth hire. You said "I know someone perfect"...</div>
           </div>
-          <div class="task-main">
-            <div class="task-title">Introduce Karan to Meera — you offered to connect them</div>
-            <div class="task-preview">Karan's looking for a growth hire. Meera's between roles. You said "I know someone perfect"...</div>
-          </div>
-          <div class="task-meta">
-            <span class="task-source-badge badge-email">● EMAIL</span>
-            <span class="task-time">5d ago</span>
-            <svg class="expand-arrow" viewBox="0 0 16 16" fill="none">
-              <path d="M4 6l4 4 4-4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
-            </svg>
+          <div class="task-right">
+            <span class="source-badge badge-email">● EMAIL</span>
+            <span class="task-age">5d ago</span>
+            <svg class="chevron" width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M3 5l4 4 4-4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
           </div>
         </div>
         <div class="story-panel">
-          <div class="story-inner">
-            <div class="story-context">
-              <div class="story-section-label">What happened</div>
-              <div class="story-text">
-                Karan emailed last Friday asking if you knew anyone good for a Head of Growth role. You replied the same day saying "I actually know someone perfect — let me check if she's open and I'll connect you." You haven't followed up with Meera yet.
-              </div>
-              <div class="story-quote">
-                "Would be amazing if you could make that intro — we're looking to move fast on this."
-                <cite>— Karan, Apr 17 · 3:41pm</cite>
-              </div>
+          <div class="story-body">
+            <div>
+              <div class="ctx-label">What happened</div>
+              <div class="ctx-text">Karan emailed Friday asking if you knew anyone for a Head of Growth role. You replied the same day: "I know someone perfect — let me check if she's open." You haven't followed up with Meera yet.</div>
+              <div class="ctx-quote">"Would be amazing if you could make that intro — we're looking to move fast."<cite>— Karan, Apr 17 · 3:41pm</cite></div>
             </div>
-            <div class="story-actions">
-              <div class="draft-label">Shram drafted — double intro</div>
+            <div>
+              <div class="draft-label">Shram drafted</div>
               <div class="tone-row">
-                <button class="tone-chip active">Warm</button>
-                <button class="tone-chip">Brief</button>
+                <button class="tone-btn active" data-card="3" data-tone="warm">Warm</button>
+                <button class="tone-btn" data-card="3" data-tone="brief">Brief</button>
               </div>
-              <textarea class="draft-box">Karan, Meera — connecting you both.
+              <textarea class="draft-text" id="draft-3">Karan, Meera — connecting you both.
 
 Karan is building something interesting and looking for a Head of Growth. Meera, you'd know better than anyone if this fits where you're headed.
 
 I'll leave it with you two.</textarea>
               <div class="action-row">
-                <button class="btn-execute">
-                  <svg width="12" height="12" viewBox="0 0 12 12" fill="none"><path d="M2 6h8M7 3l3 3-3 3" stroke="white" stroke-width="1.5" stroke-linecap="round"/></svg>
-                  Send intro
-                </button>
-                <button class="btn-ghost">Edit</button>
-                <button class="btn-ghost">Later</button>
+                <button class="btn-send" data-send="3">→ Send intro</button>
+                <button class="btn-edit" data-edit="3">Edit</button>
+                <button class="btn-later" data-later="3">Later</button>
               </div>
             </div>
           </div>
         </div>
       </div>
 
-      <!-- TASK 4 — done -->
-      <div class="task-card done" id="t4">
-        <div class="task-row" onclick="toggleTask('t4')">
-          <div class="task-check" onclick="event.stopPropagation(); toggleDone('t4')">
-            <svg class="task-check-icon" viewBox="0 0 8 8" fill="none">
-              <path d="M1 4l2 2 4-4" stroke="white" stroke-width="1.5" stroke-linecap="round"/>
-            </svg>
+      <div class="task-card is-done" id="card-4" data-source="call" data-tag="all">
+        <div class="task-row" data-card="4">
+          <button class="check-btn" data-check="4"><svg class="check-tick" width="8" height="8" viewBox="0 0 8 8" fill="none"><path d="M1.5 4l2 2 3-3" stroke="white" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
+          <div class="task-body">
+            <div class="task-name">Thank Anjali for the referral</div>
+            <div class="task-peek">She connected you with two people last week. Done this morning.</div>
           </div>
-          <div class="task-main">
-            <div class="task-title">Thank Anjali for the referral</div>
-            <div class="task-preview">She connected you with two people last week. You sent a note this morning.</div>
-          </div>
-          <div class="task-meta">
-            <span class="task-source-badge badge-call">● CALL</span>
-            <span class="task-time">Done</span>
-            <svg class="expand-arrow" viewBox="0 0 16 16" fill="none">
-              <path d="M4 6l4 4 4-4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
-            </svg>
+          <div class="task-right">
+            <span class="source-badge badge-call">● CALL</span>
+            <span class="task-age">Done</span>
+            <svg class="chevron" width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M3 5l4 4 4-4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
           </div>
         </div>
         <div class="story-panel">
-          <div class="story-inner">
-            <div class="story-context">
-              <div class="story-section-label">What happened</div>
-              <div class="story-text">Anjali connected you with two warm leads after your call last Thursday. You sent her a thank you this morning. Marked done.</div>
-            </div>
-            <div class="story-actions">
-              <div style="font-size:12px;color:var(--ink4);font-family:'Geist Mono',monospace;padding-top:8px">✓ Completed this morning</div>
-            </div>
+          <div class="story-body">
+            <div><div class="ctx-label">What happened</div><div class="ctx-text">Anjali connected you with two warm leads after your call last Thursday. You sent her a thank you this morning.</div></div>
+            <div><div style="font-size:12px;color:var(--ink4);padding-top:4px">✓ Completed this morning</div></div>
           </div>
         </div>
       </div>
 
     </div>
-
-    <div class="empty-note">
-      That's everything for today. Your memory is clear.
-    </div>
   </main>
 </div>
 
-<div class="concept-banner">
-  <strong>Concept UI</strong> — Tasks that carry their story · Built for Shram by Harshit Ram Yandapalli · harshitram29@gmail.com
-</div>
+<div class="concept-strip"><strong>Concept UI</strong> — Tasks that carry their story · Built for Shram · Harshit Ram Yandapalli · harshitram29@gmail.com</div>
 
 <script>
-function toggleTask(id) {
-  const card = document.getElementById(id);
-  if (card.classList.contains('done')) return;
-  card.classList.toggle('open');
-}
-
-function toggleDone(id) {
-  const card = document.getElementById(id);
-  card.classList.toggle('done');
-  if (card.classList.contains('done')) {
-    card.classList.remove('open');
+const drafts = {
+  1: {
+    warm: "Hi Rahul,\n\nFollowing up on our call — I've reworked the proposal to ₹3.9L while keeping everything we discussed in scope.\n\nAttaching the revised doc. Happy to jump on a quick call if you want to walk through it.\n\nLet me know what works.",
+    direct: "Rahul,\n\nRevised proposal attached — ₹3.9L, same scope.\n\nDoes this work for you?",
+    brief: "Hey Rahul — revised proposal attached. ₹3.9L. Does this work?"
+  },
+  2: {
+    warm: "Hey Priya,\n\nJust checking in on the contract — has legal had a chance to come back yet?\n\nNo rush, just want to make sure nothing's stuck on my end.",
+    direct: "Priya,\n\nFollowing up on the contract — any update from legal? It's been 9 days.",
+    brief: "Hey Priya — any update on the contract?"
+  },
+  3: {
+    warm: "Karan, Meera — connecting you both.\n\nKaran is building something interesting and looking for a Head of Growth. Meera, you'd know better than anyone if this fits where you're headed.\n\nI'll leave it with you two.",
+    brief: "Karan, Meera — making this intro. Karan needs a Head of Growth. Worth a conversation."
   }
-}
+};
+
+// Toggle card open/close
+document.querySelectorAll('.task-row').forEach(row => {
+  row.addEventListener('click', function(e) {
+    if (e.target.closest('.check-btn,.btn-send,.btn-edit,.btn-later,.tone-btn')) return;
+    const id = this.dataset.card;
+    const card = document.getElementById('card-' + id);
+    if (card.classList.contains('is-done')) return;
+    card.classList.toggle('is-open');
+  });
+});
+
+// Check done
+document.querySelectorAll('.check-btn').forEach(btn => {
+  btn.addEventListener('click', function(e) {
+    e.stopPropagation();
+    const card = document.getElementById('card-' + this.dataset.check);
+    card.classList.toggle('is-done');
+    if (card.classList.contains('is-done')) card.classList.remove('is-open');
+    const done = document.querySelectorAll('.task-card.is-done').length;
+    document.getElementById('count-done').textContent = 38 + done;
+  });
+});
+
+// Tone buttons
+document.querySelectorAll('.tone-btn').forEach(btn => {
+  btn.addEventListener('click', function(e) {
+    e.stopPropagation();
+    const cid = this.dataset.card, tone = this.dataset.tone;
+    document.querySelectorAll('.tone-btn[data-card="'+cid+'"]').forEach(b => b.classList.remove('active'));
+    this.classList.add('active');
+    if (drafts[cid] && drafts[cid][tone]) document.getElementById('draft-'+cid).value = drafts[cid][tone];
+  });
+});
+
+// Send
+document.querySelectorAll('.btn-send').forEach(btn => {
+  btn.addEventListener('click', function(e) {
+    e.stopPropagation();
+    const id = this.dataset.send, card = document.getElementById('card-'+id);
+    this.textContent = '✓ Sent'; this.classList.add('sent');
+    setTimeout(() => { card.classList.add('is-done'); card.classList.remove('is-open'); }, 700);
+    setTimeout(() => { this.textContent = '→ Send'; this.classList.remove('sent'); }, 2500);
+  });
+});
+
+// Edit
+document.querySelectorAll('.btn-edit').forEach(btn => {
+  btn.addEventListener('click', function(e) {
+    e.stopPropagation();
+    const ta = document.getElementById('draft-'+this.dataset.edit);
+    ta.focus(); ta.setSelectionRange(ta.value.length, ta.value.length);
+    this.textContent = 'Editing...';
+    ta.addEventListener('blur', () => { this.textContent = 'Edit'; }, {once:true});
+  });
+});
+
+// Later
+document.querySelectorAll('.btn-later').forEach(btn => {
+  btn.addEventListener('click', function(e) {
+    e.stopPropagation();
+    const card = document.getElementById('card-'+this.dataset.later);
+    card.classList.remove('is-open'); card.style.opacity = '0.35';
+    this.textContent = 'Snoozed';
+    setTimeout(() => { card.style.opacity = ''; this.textContent = 'Later'; }, 2000);
+  });
+});
 
 // Filter chips
-document.querySelectorAll('.filter-chip').forEach(chip => {
-  chip.addEventListener('click', () => {
-    document.querySelectorAll('.filter-chip').forEach(c => c.classList.remove('active'));
-    chip.classList.add('active');
+document.querySelectorAll('.filter-btn').forEach(btn => {
+  btn.addEventListener('click', function() {
+    document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+    document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+    this.classList.add('active');
+    const f = this.dataset.filter;
+    document.querySelectorAll('.task-card').forEach(c => {
+      c.classList.remove('is-open','is-hidden');
+      if (f === 'all') return;
+      if (f === 'urgent') { c.classList.add('is-hidden'); }
+      else if (f === 'waiting') { if (c.dataset.tag !== 'waiting') c.classList.add('is-hidden'); }
+      else if (f === 'promised') { if (c.dataset.tag !== 'promised') c.classList.add('is-hidden'); }
+    });
+    if (f === 'all') document.querySelector('.nav-item[data-filter="all"]').classList.add('active');
   });
 });
 
-// Tone chips
-document.querySelectorAll('.tone-chip').forEach(chip => {
-  chip.addEventListener('click', () => {
-    const row = chip.closest('.tone-row');
-    row.querySelectorAll('.tone-chip').forEach(c => c.classList.remove('active'));
-    chip.classList.add('active');
-  });
-});
+// Sidebar nav
+document.querySelectorAll('.nav-item').forEach(item => {
+  item.addEventListener('click', function() {
+    document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+    document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+    this.classList.add('active');
+    const f = this.dataset.filter, v = this.dataset.view;
+    const title = document.getElementById('view-title'), sub = document.getElementById('view-sub');
+    document.querySelectorAll('.task-card').forEach(c => { c.classList.remove('is-open','is-hidden'); });
 
-// Send button feedback
-document.querySelectorAll('.btn-execute').forEach(btn => {
-  btn.addEventListener('click', (e) => {
-    e.stopPropagation();
-    const original = btn.innerHTML;
-    btn.innerHTML = '✓ Sent';
-    btn.style.background = '#3d6b4f';
-    const card = btn.closest('.task-card');
-    setTimeout(() => {
-      card.classList.add('done');
-      card.classList.remove('open');
-    }, 800);
-    setTimeout(() => {
-      btn.innerHTML = original;
-      btn.style.background = '';
-    }, 2000);
+    if (f === 'all') {
+      document.querySelector('.filter-btn[data-filter="all"]').classList.add('active');
+      title.textContent = "Today's follow-ups"; sub.textContent = "4 conversations need your attention. Each one has a story.";
+    } else if (f) {
+      document.querySelectorAll('.task-card').forEach(c => { if (c.dataset.source !== f) c.classList.add('is-hidden'); });
+      const names = {whatsapp:'WhatsApp',email:'Email',meeting:'Meeting',call:'Call'};
+      title.textContent = (names[f]||f) + ' follow-ups'; sub.textContent = 'Follow-ups from ' + (names[f]||f) + '.';
+    } else if (v === 'upcoming') {
+      document.querySelectorAll('.task-card').forEach(c => c.classList.add('is-hidden'));
+      title.textContent = 'Upcoming'; sub.textContent = "Nothing due yet — you're ahead.";
+    } else if (v === 'done') {
+      document.querySelectorAll('.task-card').forEach(c => { if (!c.classList.contains('is-done')) c.classList.add('is-hidden'); });
+      title.textContent = 'Done'; sub.textContent = 'Conversations you closed.';
+    }
   });
 });
 </script>
